@@ -1,7 +1,9 @@
-require_relative './background_board'
+require_relative './block'
 
 class ConsoleTetris
   class Tetrimino
+    attr_accessor :x_coordinate, :y_coordinate
+
     def initialize(x = 0, y = 0, degree = 0, block_type:)
       @x_coordinate = x
       @y_coordinate = y
@@ -49,170 +51,27 @@ class ConsoleTetris
       @degree += 90
       @degree = 0 if @degree == 360
 
-      @y_coordinate = @y_coordinate - before_block.max.count(1).times.count {|i| BackgroundBoard.blank_board[@y_coordinate + i].nil? }
-      @x_coordinate = @x_coordinate - before_block.map {|a| a.any? {|e| e == 1} ? 1 : 0 }.count(1).times.count {|i| BackgroundBoard.blank_board[@y_coordinate][@x_coordinate + i].nil? }
+      @y_coordinate = 20 - block.size if @y_coordinate + block.size > 20
+      @x_coordinate = 10 - block.first.size if @x_coordinate + block.first.size > 10
 
       @y_coordinate = 0 if @y_coordinate.negative?
       @x_coordinate = 0 if @x_coordinate.negative?
     end
 
     def block
-      send(@block_type)
+      Block.send(@block_type, @degree)
     end
 
     def left_edge?
-      block.any? {|a| a.first == 1 }
+      @x_coordinate == 0
     end
 
     def right_edge?
-      block.any? {|a| a.last == 1 }
+      @x_coordinate + block.first.size > 9
     end
 
     def bottom_edge?
-      block.last.any? {|e| e == 1 }
-    end
-
-    private
-
-    def type_j
-      board = BackgroundBoard.blank_board
-
-      case @degree
-      when 0
-        4.times {|i| board[@y_coordinate][@x_coordinate + i] = 1 }
-
-        board[@y_coordinate + 1][@x_coordinate + 3] = 1
-      when 90
-        4.times {|i| board[@y_coordinate + i][@x_coordinate + 1] = 1 }
-
-        board[@y_coordinate + 3][@x_coordinate] = 1
-      when 180
-        4.times {|i| board[@y_coordinate][@x_coordinate + i] = 1 }
-
-        board[@y_coordinate - 1][@x_coordinate] = 1
-      when 270
-        4.times {|i| board[@y_coordinate + i][@x_coordinate] = 1 }
-
-        board[@y_coordinate][@x_coordinate + 1] = 1
-      end
-
-      board
-    end
-
-    def type_l
-      board = BackgroundBoard.blank_board
-
-      case @degree
-      when 0
-        4.times {|i| board[@y_coordinate][@x_coordinate + i] = 1 }
-
-        board[@y_coordinate + 1][@x_coordinate] = 1
-      when 90
-        4.times {|i| board[@y_coordinate + i][@x_coordinate + 1] = 1 }
-
-        board[@y_coordinate][@x_coordinate] = 1
-      when 180
-        4.times {|i| board[@y_coordinate + 1][@x_coordinate + i] = 1 }
-
-        board[@y_coordinate][@x_coordinate + 3] = 1
-      when 270
-        4.times {|i| board[@y_coordinate + i][@x_coordinate] = 1 }
-
-        board[@y_coordinate + 3][@x_coordinate + 1] = 1
-      end
-
-      board
-    end
-
-    def type_i
-      board = BackgroundBoard.blank_board
-
-      case @degree
-      when 0
-        4.times {|i| board[@y_coordinate][@x_coordinate + i] = 1 }
-      when 90
-        4.times {|i| board[@y_coordinate + i][@x_coordinate + 2] = 1 }
-      when 180
-        4.times {|i| board[@y_coordinate + 2][@x_coordinate + i] = 1 }
-      when 270
-        4.times {|i| board[@y_coordinate + i][@x_coordinate] = 1 }
-      end
-
-      board
-    end
-
-    def type_o
-      board = BackgroundBoard.blank_board
-
-      2.times {|i|
-        board[@y_coordinate][@x_coordinate + i] = 1
-        board[@y_coordinate + 1][@x_coordinate + i] = 1
-      }
-
-      board
-    end
-
-    def type_s
-      board = BackgroundBoard.blank_board
-
-      case @degree
-      when 0, 180
-        2.times {|i|
-          board[@y_coordinate][@x_coordinate + i + 1] = 1
-          board[@y_coordinate + 1][@x_coordinate + i] = 1
-        }
-      when 90, 270
-        2.times {|i|
-          board[@y_coordinate + i][@x_coordinate] = 1
-          board[@y_coordinate + i + 1][@x_coordinate + 1] = 1
-        }
-      end
-
-      board
-    end
-
-    def type_z
-      board = BackgroundBoard.blank_board
-
-      case @degree
-      when 0, 180
-        2.times {|i|
-          board[@y_coordinate][@x_coordinate + i] = 1
-          board[@y_coordinate + 1][@x_coordinate + i + 1] = 1
-        }
-      when 90, 270
-        2.times {|i|
-          board[@y_coordinate + i + 1][@x_coordinate] = 1
-          board[@y_coordinate + i][@x_coordinate + 1] = 1
-        }
-      end
-
-      board
-    end
-
-    def type_t
-      board = BackgroundBoard.blank_board
-
-      case @degree
-      when 0
-        3.times {|i| board[@y_coordinate + 1][@x_coordinate + i] = 1 }
-
-        board[@y_coordinate + 2][@x_coordinate + 1] = 1
-      when 90
-        3.times {|i| board[@y_coordinate + i][@x_coordinate + 1] = 1 }
-
-        board[@y_coordinate + 1][@x_coordinate] = 1
-      when 180
-        3.times {|i| board[@y_coordinate + 1][@x_coordinate + i] = 1 }
-
-        board[@y_coordinate][@x_coordinate + 1] = 1
-      when 270
-        3.times {|i| board[@y_coordinate + i][@x_coordinate + 1] = 1 }
-
-        board[@y_coordinate + 1][@x_coordinate + 2] = 1
-      end
-
-      board
+      @y_coordinate + block.size > 19
     end
   end
 end

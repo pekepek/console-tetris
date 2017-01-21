@@ -6,27 +6,23 @@ class ConsoleTetris
 
     BOARD_SIZE = {x: 10, y: 20}
 
-    class << self
-      def blank_board
-        BOARD_SIZE[:y].times.map { blank_line }
-      end
-
-      def blank_line
-        Array.new(BOARD_SIZE[:x]).fill(0)
-      end
-    end
-
     def initialize
-      @board = self.class.blank_board
+      @board = blank_board
       @point = 0
     end
 
-    def stack!(block)
-      @board = @board.map.with_index {|a, i| a.map.with_index {|e, j| e | block[i][j] } }
+    def stack!(tetrimino)
+      tetrimino.block.each.with_index {|row, i| row.each.with_index {|value, j| @board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] |= value } }
     end
 
-    def overlap?(block)
-      @board.map.with_index {|a, i| a.map.with_index {|e, j| e & block[i][j] } }.any? {|a| a.any? {|e| e > 0 } }
+    def overlap?(tetrimino)
+      tetrimino.block.map.with_index.any? {|row, i|
+        row.map.with_index.any? {|value, j|
+          return false if @board[tetrimino.y_coordinate + i].nil?
+
+          @board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] & value > 0
+        }
+      }
     end
 
     def remove_filled_line!
@@ -35,10 +31,14 @@ class ConsoleTetris
       remove_size = BOARD_SIZE[:y] - @board.count
 
       @point = @point + remove_size * 1000
-      remove_size.times { @board.unshift(self.class.blank_line) }
+      remove_size.times { @board.unshift(blank_line) }
     end
 
-    def print_block(block)
+    def print_block(tetrimino)
+      dup_board = @board.map {|board| board.dup }
+
+      tetrimino.block.each.with_index {|row, i| row.each.with_index {|value, j| dup_board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] |= value } }
+
       print "\e[2J"
       print "\e[1;1H"
 
@@ -50,7 +50,7 @@ class ConsoleTetris
       print '__' * BOARD_SIZE[:x]
       print "\n"
 
-      @board.map.with_index {|a, i| a.map.with_index {|e, j| e | block[i][j] } }.each do |elements|
+      dup_board.each do |elements|
         print "\e[G"
 
         elements.each do |el|
@@ -74,6 +74,16 @@ class ConsoleTetris
       print "\e[1;1H"
       print "#{AsciiArt.number_to_aa(point).gsub(/^/, "\e[G")} Points!!!!\n"
       print AsciiArt::GAMEOVER.gsub(/^/, "\e[G")
+    end
+
+    private
+
+    def blank_board
+      BOARD_SIZE[:y].times.map { blank_line }
+    end
+
+    def blank_line
+      Array.new(BOARD_SIZE[:x]).fill(0)
     end
   end
 end
