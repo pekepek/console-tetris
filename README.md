@@ -16,6 +16,12 @@ Or install it yourself as:
 
     $ gem install console-tetris
 
+## Start Game
+
+```
+$ console_tetris
+```
+
 ## Commands
 
 `.` : move right
