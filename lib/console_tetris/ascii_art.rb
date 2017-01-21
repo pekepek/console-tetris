@@ -121,7 +121,12 @@ class ConsoleTetris
 
       splitted_number_aas = number_aas.map {|n| n.split("\n") }
 
-      6.times.map {|i| splitted_number_aas.map {|aa| aa[i].to_s.ljust(8) }.join('') }.join("\n")
+      6.times.map {|i|
+        splitted_number_aas.map {|aa|
+          max_length = aa.map(&:size).max
+          aa[i].to_s.ljust(max_length)
+        }.join('')
+      }.join("\n")
     end
   end
 end
