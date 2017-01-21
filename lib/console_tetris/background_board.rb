@@ -1,16 +1,10 @@
+require_relative './ascii_art'
+
 class ConsoleTetris
   class BackgroundBoard
     attr_accessor :point
 
     BOARD_SIZE = {x: 10, y: 20}
-    GAMEOVER = <<-'EOS'
-    _____          __  __  _____   ______      ________  _____
-   / ____|   /\   |  \/  ||  ___| / __ \ \    / /  ____||  __ \
-  | |  __   /  \  | \  / || |__  | |  | \ \  / /| |__   | |__) |
-  | | |_ | / /\ \ | |\/| ||  __| | |  | |\ \/ / |  __|  |  _  /
-  | |__| |/ ____ \| |  | || |___ | |__| | \  /  | |____ | | \ \
-   \_____/_/    \_\_|  |_||_____| \____/   \/   |______||_|  \_\
-    EOS
 
     class << self
       def blank_board
@@ -78,8 +72,8 @@ class ConsoleTetris
     def print_gameover
       print "\e[2J"
       print "\e[1;1H"
-      print "\e[G#{point.to_s.rjust(7, ' ')} 点!!!!\n"
-      print GAMEOVER.gsub(/^/, "\e[G")
+      print "#{AsciiArt.number_to_aa(point).gsub(/^/, "\e[G")} Points!!!!\n"
+      print AsciiArt::GAMEOVER.gsub(/^/, "\e[G")
     end
   end
 end
