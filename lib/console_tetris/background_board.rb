@@ -34,17 +34,40 @@ class ConsoleTetris
       remove_size.times { @board.unshift(blank_line) }
     end
 
+    def print_point
+      print "\e[3;1H"
+
+      print "\e[13G"
+      print "\e[K"
+      print "#{@point.to_s.rjust(6, ' ')} P\n"
+
+      print "\e[13G"
+      print "\e[K"
+      print "-------- \n"
+    end
+
+    def print_next_block(tetrimino)
+      block = tetrimino.block.map {|row| row.map {|b| b == 1 ? '[]' : '  ' }.join('') }
+
+      print "\e[5;1H"
+      print "\e[1J"
+      print "\e[1;1H"
+
+      print "\e[G ---------- \n"
+      print "\e[G| #{block[0].to_s.center(8, ' ')} |\n"
+      print "\e[G| #{block[1].to_s.center(8, ' ')} |\n"
+      print "\e[G ---------- \n"
+    end
+
     def print_block(tetrimino)
       dup_board = @board.map {|board| board.dup }
 
       tetrimino.block.each.with_index {|row, i| row.each.with_index {|value, j| dup_board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] |= value } }
 
-      print "\e[2J"
-      print "\e[1;1H"
+      print_point
 
-      print "\e[G _____________ \n"
-      print "\e[G| #{@point.to_s.rjust(11, ' ')} |\n"
-      print "\e[G ‾‾‾‾‾‾‾‾‾‾‾‾‾ \n"
+      print "\e[5;1H"
+      print "\e[J"
 
       print "\e[G"
       print '__' * BOARD_SIZE[:x]

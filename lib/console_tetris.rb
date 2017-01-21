@@ -9,9 +9,10 @@ class ConsoleTetris
   def self.start
     @background_board = BackgroundBoard.new
 
-    type = "type_#{BLOCK_TYPES.sample}"
-    @tetrimino = Tetrimino.new(block_type: type)
+    @tetrimino = Tetrimino.new(block_type: "type_#{BLOCK_TYPES.sample}")
+    next_tetrimino = Tetrimino.new(block_type: "type_#{BLOCK_TYPES.sample}")
 
+    @background_board.print_next_block(next_tetrimino)
     @background_board.print_block(@tetrimino)
 
     Thread.new do
@@ -38,8 +39,10 @@ class ConsoleTetris
 
           @background_board.print_block(@tetrimino)
 
-          type = "type_#{BLOCK_TYPES.sample}"
-          @tetrimino = Tetrimino.new(block_type: type)
+          @tetrimino = next_tetrimino
+          next_tetrimino = Tetrimino.new(block_type: "type_#{BLOCK_TYPES.sample}")
+
+          @background_board.print_next_block(next_tetrimino)
         end
       end
 
