@@ -48,11 +48,11 @@ class ConsoleTetris
 
     def print_next_block(tetrimino)
       block = tetrimino.block.map {|row|
-        row.map {|b|
-          next '  ' if b == 0
+        block_number = tetrimino.block.flatten.max
 
-          "\e[3#{b}m[]"
-        }.join('') + "\e[0m"
+        b = row.map {|b| b == 0 ? '  ' : '[]' }.join('').center(8, ' ')
+
+        "\e[3#{block_number}m" + b + "\e[0m"
       }
 
       print "\e[5;1H"
