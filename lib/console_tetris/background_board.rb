@@ -12,7 +12,7 @@ class ConsoleTetris
     end
 
     def stack!(tetrimino)
-      tetrimino.block.each.with_index {|row, i| row.each.with_index {|value, j| @board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] |= value } }
+      tetrimino.block.each.with_index {|row, i| row.each.with_index {|value, j| @board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] += value } }
     end
 
     def overlap?(tetrimino)
@@ -20,13 +20,13 @@ class ConsoleTetris
         row.map.with_index.any? {|value, j|
           return false if @board[tetrimino.y_coordinate + i].nil?
 
-          @board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] & value > 0
+          @board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] > 0 && value > 0
         }
       }
     end
 
     def remove_filled_line!
-      @board.reject! {|a| a.all? {|e| e == 1 } }
+      @board.reject! {|a| a.all? {|e| e != 0 } }
 
       remove_size = BOARD_SIZE[:y] - @board.count
 
@@ -47,7 +47,13 @@ class ConsoleTetris
     end
 
     def print_next_block(tetrimino)
-      block = tetrimino.block.map {|row| row.map {|b| b == 1 ? '[]' : '  ' }.join('') }
+      block = tetrimino.block.map {|row|
+        row.map {|b|
+          next '  ' if b == 0
+
+          "\e[3#{b}m[]"
+        }.join('') + "\e[0m"
+      }
 
       print "\e[5;1H"
       print "\e[1J"
@@ -62,7 +68,13 @@ class ConsoleTetris
     def print_block(tetrimino)
       dup_board = @board.map {|board| board.dup }
 
-      tetrimino.block.each.with_index {|row, i| row.each.with_index {|value, j| dup_board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] |= value } }
+      tetrimino.block.each.with_index {|row, i|
+        row.each.with_index {|value, j|
+          next if dup_board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j].nil?
+
+          dup_board[tetrimino.y_coordinate + i][tetrimino.x_coordinate + j] += value
+        }
+      }
 
       print_point
 
@@ -80,10 +92,12 @@ class ConsoleTetris
           print case el
             when 0
               '  '
-            when 1
-              '[]'
+            when 1..7
+              "\e[3#{el}m[]"
             end
         end
+
+        print "\e[0m"
 
         print "|\n"
       end
