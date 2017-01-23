@@ -53,7 +53,7 @@ class ConsoleTetris
 
     while (str = STDIN.getch) != "\C-c"
       case str
-      when '.'
+      when 'x'
         next if @tetrimino.right_edge?
 
         @tetrimino.move_right
@@ -63,7 +63,7 @@ class ConsoleTetris
 
         @tetrimino.move_left
         @tetrimino.back_horizontally if @background_board.overlap?(@tetrimino)
-      when "\r"
+      when ' '
         @tetrimino.rotate
 
         loop do
